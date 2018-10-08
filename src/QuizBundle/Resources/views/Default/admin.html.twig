@@ -1,0 +1,56 @@
+{% extends "@Quiz/Default/base.html.twig" %}
+{% block logout%}
+	<li class="nav-item" style="padding-left:40em">
+		<a class="nav-link js-scroll-trigger" href="{{ path('fos_user_security_logout') }}">Logout</a>
+	</li>
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 marginTable">
+				<div class="table-responsive margin">
+					{% for message in app.flashes('succcess') %}
+						<div class="alert alert-success">
+							<strong>{{ message }}!</strong>
+						</div>
+					{% endfor %}
+					<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+					<table id="mytable" class="table table-bordred table-striped">
+						<thead>
+							<th><input type="checkbox" id="checkall"/></th>
+							<th>User</th>
+							<th>Score</th>
+							<th>Edit</th>
+							<th>Delete</th>
+						</thead>
+						<tbody>
+
+							{% for userScore in userScores %}
+
+								<tr>
+									<td><input type="checkbox" class="checkthis"/></td>
+									<td>{{ userScore.user.email }}</td>
+									<td>{{ userScore.score }}</td>
+									<td><a href="">
+										<button type="button" class="btn btn-success btn-sm">Edit</button>
+										</a></td>
+									<td>
+										<button type="button" class="btn btn-danger btn-sm clickable-row" onClick="cwRating({{ userScore.id}}, 0)">Delete</button>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					<div class="clearfix"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block middle %}
+
+
+{% endblock %}

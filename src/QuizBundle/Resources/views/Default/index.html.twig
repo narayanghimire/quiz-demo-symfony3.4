@@ -1,0 +1,35 @@
+{% extends "@Quiz/Default/base.html.twig" %}
+
+
+{% block content %}
+	<div id="form">
+		<section id="about">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-8 mx-auto">
+						<div class="wrap-contact100">
+
+							<label class="label-input100" for="email">If you account and  want to start Quiz</label>
+							<a href="{{ path('start_quiz') }}"><button type="button" class="btn btn-primary btn-block contact100-form-btn">Start Quiz</button></a>
+								<span class="focus-input100"></span><br><br><br>
+							<span>
+								<label class="label-input100" for="email">Create user account</label>
+							<a href="{{ path('fos_user_registration_register') }}"><button type="button" class="btn btn-primary btn-block btn-link contact100-form-btn">Create Account </button></a>
+						</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+
+	<script>
+		$('#picture-upload').hide();
+		$('#upload-picture').click(function () {
+			$('#picture-upload').show();
+
+		});
+	</script>
+
+{% endblock %}

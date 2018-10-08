@@ -1,0 +1,10 @@
+{% extends "@FOSUser/layout.html.twig" %}
+
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block fos_user_content %}
+    {% block role %} {% endblock %}
+    <div class="alert alert-success" role="alert">
+        you have successfully register.Please click to <a href="{{ path("fos_user_security_login") }}" class="btn btn-link">Login</a>
+    </div>
+{% endblock fos_user_content %}

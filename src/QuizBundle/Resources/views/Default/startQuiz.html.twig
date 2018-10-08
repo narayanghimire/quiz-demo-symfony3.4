@@ -1,0 +1,279 @@
+{% extends "@Quiz/Default/base.html.twig" %}
+{% set currentPath = app.request.get('_route')%}
+{% block logout%}
+	<li class="nav-item" style="padding-left:40em">
+		<a class="nav-link js-scroll-trigger" href="{{ path('fos_user_security_logout') }}">Logout</a>
+
+	</li>
+	<li class="nav-item" style="padding-right:250px">
+		<a class="nav-link js-scroll-trigger" href="{{ path('admin_check') }}">check Quiz data</a>
+	</li>
+{% endblock %}
+{% block addtionalHead %}
+
+	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+{% endblock %}
+{% block content %}
+	<div class="container-fluid bg-info">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<div id="question">
+						<h3> What is Normal Number of <div id="display"></div> </h3>
+					</div>
+					<div id="message"></div>
+				</div>
+				<div class="modal-body">
+					<div class="col-xs-3 col-xs-offset-5">
+						<div id="loadbar" style="display: none;">
+							<div class="blockG" id="rotateG_01"></div>
+							<div class="blockG" id="rotateG_02"></div>
+							<div class="blockG" id="rotateG_03"></div>
+							<div class="blockG" id="rotateG_04"></div>
+							<div class="blockG" id="rotateG_05"></div>
+							<div class="blockG" id="rotateG_06"></div>
+							<div class="blockG" id="rotateG_07"></div>
+							<div class="blockG" id="rotateG_08"></div>
+						</div>
+					</div>
+					<div id="success-message"></div>
+					<div id="hide">
+						<div class="btn-group" id="quiz" role="group" data-toggle="buttons"></div>
+					</div>
+
+
+				</div>
+				<div class="modal-footer text-muted">
+
+					<form id ="myform-data" class="form-group">
+						<label for="Gues" id="guess">Please use Guess carefully.Only 3 wrong Guess is allowed</label>
+						<div id="guess">Guess Count Left: <div id="guesscount">3</div></div>
+						<input type="text" required="required" class="form-control" name="quizGuessId"  placeholder="Check your guess only 3 wrong guess is allowed">
+						<br>
+						<input type="submit"  value="Submit" class="btn btn-success" ></input>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script>
+
+		/*************************User Guessing for the question*******************/
+		$('#myform-data').submit(function (event) {
+			event.preventDefault();
+			var data = $('#myform-data').serialize();
+			var question = document.getElementById('display').innerHTML;
+			var guessCount = document.getElementById('guesscount').innerHTML;
+			const number = {
+				guess: data,
+				ques: question,
+			}
+
+			$.ajax({
+				type: 'POST',
+				url: '/convert/intger/roman',
+				data: number,
+				success: function (response) {
+					console.log(response);
+					if(response == 1){
+						let guess = 'Congrulation Your guess is correct '
+						$('#guess').html(guess)
+					}else{
+						let guessCountLeft = guessCount - 1;
+						let guess = 'Sorry you choose Wrong Number '
+						$('#guess').html(guess)
+						$('#guesscount').html(guessCountLeft)
+						if(guessCountLeft == 0){
+							$('#myform-data').remove()
+
+						}
+					}
+
+
+
+				}
+			})
+
+
+		});
+/**********************Loading the Question and Anser for Quiz **************************/
+		$(function(){
+			var loading = $('#loadbar').hide();
+			$(document)
+			.ajaxStart(function () {
+				loading.show();
+			}).ajaxStop(function () {
+				loading.hide();
+			});
+
+			var items = {{ quizQuestions|json_encode|raw }};
+			let round = {{ round.id }};
+			var rand = items[Math.floor(Math.random() * items.length)];
+			console.log(items);
+			console.log(rand);
+			$('#display').text(rand);
+			items.splice(items.indexOf(rand), 1);
+			const data = {
+				rand: rand,
+
+			}
+
+			$.ajax({
+				type: 'POST',
+				url: '/convert/data',
+				data: data,
+				success: function (response) {
+					var div=[]
+					for(i = 0; i < response.length; i++ ){
+
+						let s = ''
+						s += '<label class="element-animation1 btn btn-lg btn-primary btn-block" >'
+						s += '<span class="btn-label">'
+						s += '<i class="glyphicon glyphicon-chevron-right">'
+						s += '</i>'
+						s += '</span>'
+						s += '<input type="radio" class="service"   name="service"" value="'+response[i]+'">'
+						s +=  response[i]
+						s += '</label>'
+						var html = div.push(s);
+					}
+					$('#quiz').html(div)
+
+				}
+			})
+
+			$('#quiz').on('click',function () {
+				var choice = $(this).find('input:radio').val();
+				var forma_pago = $('input[type="radio"]:checked').val();
+				alert(forma_pago);
+				var question = document.getElementById('display').innerHTML;
+				const data = {
+					rand: rand,
+					round: round,
+					choice : choice,
+					question : question,
+
+				}
+				$.ajax({
+					type: 'POST',
+					url: '/save/data',
+					data: data,
+					success: function (response) {
+							console.log(response);
+					}
+				});
+				var rand = items[Math.floor(Math.random() * items.length)];
+				console.log(items);
+				console.log(rand);
+				$('#display').text(rand);
+				$('#quiz').fadeOut();
+				$('#loadbar').show();
+				var remove = items.splice(items.indexOf(rand), 1);
+				const num = {
+					rand: rand,
+
+				}
+				$.ajax({
+					type: 'POST',
+					url: '/convert/data',
+					data: num,
+					success: function (response) {
+						var div=[]
+						for(i = 0; i < response.length; i++ ){
+
+							let s = ''
+							s += '<label class="element-animation1 btn btn-lg btn-primary btn-block" >'
+							s += '<span class="btn-label">'
+							s += '<i class="glyphicon glyphicon-chevron-right">'
+							s += '</i>'
+							s += '</span>'
+							s += '<input type="radio"  name="q_answer'+[i]+'" value="'+response[i]+'">'
+							s +=  response[i]
+							s += '</label>'
+							var html = div.push(s);
+						}
+						$('#quiz').html(div)
+
+					}
+				})
+				/**************************Displaying the result of the quiz *********************************************/
+				if(items.length == 0){
+					$('#hide').remove();
+					$('#question').remove();
+					let m = ''
+					m += '<h3>Please check  your score</h3>'
+					$('#message').html(m);
+					$('#loadbar').show();
+					const data = {
+						round: {{ round.id }},
+
+					}
+					$.ajax({
+						type: 'POST',
+						url: '/show/result',
+						data: data,
+						success: function (response) {
+							console.log(response);
+
+						let	s  = '<p class="text-center">'
+							s += 'Thank you very much </P> '
+							s +=  '<br>'
+							s += '<p class="text-center"> You Have score Total:  '
+							s +=  response
+							s +=  '</P> '
+							s +=  '<br>'
+							s +=  '<br>'
+							s +=  '<br>'
+							s += '<p class="text-center">'
+							s += 'Your are very much ====== <strong>' + customValue(response) + '</strong>  .'
+							s += '</p>'
+							s +=  '<br>'
+							s +=  'Do you want to play Quiz?press the Button'
+							s += '<a href="{{ path('start_quiz') }}" class="btn btn-info" role="button">Start Agin</a>'
+							console.log(customValue(response));
+							console.log(s);
+							$('#success-message').html(s)
+							$('#myform-data').remove()
+						}
+					});
+				}
+
+				function customValue(val) {
+					if (val == 0) {
+						return 'Looser';
+					} else if (val <= 3) {
+						return 'Not BAD';
+					} else if (val <= 5) {
+						return 'Good'
+					} else if (val <= 7) {
+						return 'Very Good'
+					} else if (val <=10 ) {
+						return 'Excellent'
+					}
+				}
+				setTimeout(function(){
+					$( "#answer" ).html(  $(this).checking(choice) );
+					$('#quiz').show();
+					$('#loadbar').fadeOut();
+				}, 1500);
+			})
+
+			$ans = 3;
+
+			$.fn.checking = function(ck) {
+				if (ck != $ans)
+					return '';
+				else
+					return '';
+			};
+		});
+
+
+	</script>
+
+{% endblock %}
+

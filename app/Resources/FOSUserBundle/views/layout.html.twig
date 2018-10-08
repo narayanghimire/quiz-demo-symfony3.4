@@ -1,0 +1,54 @@
+{% extends "@Quiz/Default/base.html.twig" %}
+{% block stylesheets %}
+    <style>
+        form{ max-width: 400px; margin: 50px auto; padding: 20px}
+        input[type-text], input[type-password], input[type-submit] {display: block; margin: 10px 0;}
+
+    </style>
+
+{% endblock %}
+{% block content %}
+
+
+    <div id="form">
+        <section id="about">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="wrap-contact100">
+
+                            <div>
+		                        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+			                        {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
+                                    <a href="{{ path('fos_user_security_logout') }}">
+			                        {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+                                    </a>
+		                        {% else %}
+                                    <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
+		                        {% endif %}
+                            </div>
+
+	                        {% if app.request.hasPreviousSession %}
+		                        {% for type, messages in app.session.flashbag.all() %}
+			                        {% for message in messages %}
+                                        <div class="flash-{{ type }}">
+					                        {{ message }}
+                                        </div>
+			                        {% endfor %}
+		                        {% endfor %}
+	                        {% endif %}
+
+                            <div>
+		                        {% block fos_user_content %}
+		                        {% endblock fos_user_content %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+{% endblock %}
