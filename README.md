@@ -10,7 +10,7 @@ Run the following command in command line
 
 3. php bin/console do:mi:mi
 
-4. 4. php bin/console server:run
+4. php bin/console server:run
 
 
 
