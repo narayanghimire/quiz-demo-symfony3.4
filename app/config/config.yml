@@ -49,6 +49,7 @@ doctrine:
         user: '%database_user%'
         password: '%database_password%'
         charset: UTF8
+        server_version: 10.1.36
         mapping_types:
                             enum: string
         default_table_options:
